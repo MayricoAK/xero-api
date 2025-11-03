@@ -134,14 +134,14 @@ const XeroService = {
     return response.body.accounts;
   },
 
-  async getTaxRates(params) {
-    const tenantId = await this.ensureValidToken();
-    const response = await xero.accountingApi.getTaxRates(
+  async getAccounts(params, token) {
+    const tenantId = await this.ensureValidToken(token);
+    const response = await xero.accountingApi.getAccounts(
       tenantId,
       params.where,
       params.order
     );
-    return response.body.taxRates;
+    return response.body.accounts;
   },
 };
 
