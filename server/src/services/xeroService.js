@@ -31,12 +31,6 @@ const XeroService = {
     const now = new Date();
     const expiresAt = new Date(token.expires_at);
 
-    await xero.setTokenSet({
-      access_token: token.access_token,
-      refresh_token: token.refresh_token,
-      expires_at: token.expires_at,
-    });
-
     if (expiresAt <= now) {
       console.log("🔁 Xero token expired — refreshing...");
 
@@ -47,6 +41,12 @@ const XeroService = {
         token.refresh_token
       );
 
+      token = {
+        access_token: newToken.access_token,
+        refresh_token: newToken.refresh_token,
+        expires_at: newToken.expires_in,
+      }
+
       await XeroTokenModel.updateToken({
         accessToken: newToken.access_token,
         refreshToken: newToken.refresh_token,
@@ -55,16 +55,11 @@ const XeroService = {
 
       console.log("✅ Xero token refreshed");
 
-      token = await XeroTokenModel.getActiveToken();
-
-      await xero.setTokenSet({
-        access_token: token.access_token,
-        refresh_token: token.refresh_token,
-        expires_at: token.expires_at,
-      });
     }
 
-    return token.tenant_id;
+    await xero.setTokenSet(token);
+
+    return passedToken.tenant_id;
   },
 
   async getInvoices(params, token) {
